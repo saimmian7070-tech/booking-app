@@ -306,6 +306,8 @@ function Booking() {
 
   const navigate = useNavigate();
 
+  const API_BASE = "https://YOUR-BACKEND-URL"; // 👈 replace this
+
   const services = [
     { name: "Web Development", icon: "💻" },
     { name: "App Development", icon: "📱" },
@@ -313,8 +315,6 @@ function Booking() {
     { name: "SEO Optimization", icon: "🚀" },
     { name: "Bug Fixing", icon: "🛠️" }
   ];
-
-  const API_BASE = "https://YOUR-BACKEND-URL"; // 👈 replace with Replit URL
 
   const fetchBookings = () => {
     const token = localStorage.getItem("token");
@@ -326,19 +326,20 @@ function Booking() {
         }
       })
       .then(res => {
+        console.log("BOOKINGS API RESPONSE 👉", res.data);
+
         const data = res.data;
 
-        // ✅ safe handling (fixes .map crash)
-        if (Array.isArray(data)) {
-          setBookings(data);
-        } else if (Array.isArray(data.bookings)) {
-          setBookings(data.bookings);
-        } else {
-          setBookings([]);
-        }
+        const safeData =
+          Array.isArray(data) ? data :
+          Array.isArray(data?.bookings) ? data.bookings :
+          Array.isArray(data?.data) ? data.data :
+          [];
+
+        setBookings(safeData);
       })
       .catch(err => {
-        console.log("Fetch error:", err);
+        console.log("API ERROR:", err.response?.data || err.message);
         setBookings([]);
       });
   };
@@ -440,9 +441,7 @@ function Booking() {
         <div style={styles.panel}>
           <h2 style={styles.heading}>Recent Bookings</h2>
 
-          {Array.isArray(bookings) && bookings.length === 0 ? (
-            <p style={{ opacity: 0.5 }}>No bookings yet</p>
-          ) : (
+          {Array.isArray(bookings) && bookings.length > 0 ? (
             bookings.map((b, i) => (
               <div key={i} style={styles.bookingCard}>
                 <div style={styles.avatar}>
@@ -451,14 +450,18 @@ function Booking() {
 
                 <div style={{ flex: 1 }}>
                   <div style={styles.bookingTop}>
-                    <span style={styles.name}>{b.userName}</span>
+                    <span style={styles.name}>{b?.userName || "Unknown"}</span>
                     <span style={styles.badge}>Booked</span>
                   </div>
 
-                  <p style={styles.serviceText}>{b.serviceName}</p>
+                  <p style={styles.serviceText}>
+                    {b?.serviceName || "N/A"}
+                  </p>
                 </div>
               </div>
             ))
+          ) : (
+            <p style={{ opacity: 0.5 }}>No bookings available</p>
           )}
         </div>
 
@@ -467,6 +470,7 @@ function Booking() {
   );
 }
 
+/* STYLES */
 const styles = {
   page: {
     minHeight: "100vh",
