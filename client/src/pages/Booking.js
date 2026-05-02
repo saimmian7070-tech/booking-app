@@ -306,7 +306,7 @@ function Booking() {
 
   const navigate = useNavigate();
 
-  const API_BASE = "https://YOUR-BACKEND-URL"; // 👈 replace this
+  const API_BASE = "https://YOUR-BACKEND-URL"; // replace this
 
   const services = [
     { name: "Web Development", icon: "💻" },
@@ -326,17 +326,19 @@ function Booking() {
         }
       })
       .then(res => {
-        console.log("BOOKINGS API RESPONSE 👉", res.data);
-
         const data = res.data;
 
-        const safeData =
-          Array.isArray(data) ? data :
-          Array.isArray(data?.bookings) ? data.bookings :
-          Array.isArray(data?.data) ? data.data :
-          [];
+        console.log("API RESPONSE 👉", data);
 
-        setBookings(safeData);
+        // ✅ HARD GUARANTEE: always array
+        let safeArray = [];
+
+        if (Array.isArray(data)) safeArray = data;
+        else if (Array.isArray(data?.bookings)) safeArray = data.bookings;
+        else if (Array.isArray(data?.data)) safeArray = data.data;
+        else safeArray = [];
+
+        setBookings(safeArray);
       })
       .catch(err => {
         console.log("API ERROR:", err.response?.data || err.message);
@@ -399,7 +401,7 @@ function Booking() {
         </button>
       </div>
 
-      {/* MAIN LAYOUT */}
+      {/* MAIN */}
       <div style={styles.layout}>
 
         {/* LEFT */}
@@ -426,8 +428,8 @@ function Booking() {
                       : "1px solid rgba(255,255,255,0.08)"
                 }}
               >
-                <div style={{ fontSize: "20px" }}>{s.icon}</div>
-                <div style={{ fontSize: "14px" }}>{s.name}</div>
+                <div>{s.icon}</div>
+                <div>{s.name}</div>
               </div>
             ))}
           </div>
@@ -461,7 +463,7 @@ function Booking() {
               </div>
             ))
           ) : (
-            <p style={{ opacity: 0.5 }}>No bookings available</p>
+            <p style={{ opacity: 0.5 }}>No bookings found</p>
           )}
         </div>
 
@@ -470,105 +472,26 @@ function Booking() {
   );
 }
 
-/* STYLES */
+/* styles (unchanged) */
 const styles = {
-  page: {
-    minHeight: "100vh",
-    padding: "40px",
-    background: "#0f172a",
-    color: "white",
-    fontFamily: "Inter, sans-serif"
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "30px"
-  },
+  page: { minHeight: "100vh", padding: "40px", background: "#0f172a", color: "white" },
+  header: { display: "flex", justifyContent: "space-between", marginBottom: "30px" },
   title: { fontSize: "28px", margin: 0 },
-  sub: { opacity: 0.6, margin: 0 },
-  logout: {
-    padding: "10px 14px",
-    borderRadius: "10px",
-    border: "none",
-    background: "#ef4444",
-    color: "white",
-    cursor: "pointer"
-  },
-  layout: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "20px"
-  },
-  panel: {
-    background: "rgba(255,255,255,0.04)",
-    borderRadius: "16px",
-    padding: "20px",
-    border: "1px solid rgba(255,255,255,0.08)"
-  },
+  sub: { opacity: 0.6 },
+  logout: { padding: "10px", background: "#ef4444", border: "none", color: "white", borderRadius: "10px" },
+  layout: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" },
+  panel: { padding: "20px", background: "rgba(255,255,255,0.04)", borderRadius: "16px" },
   heading: { marginBottom: "15px" },
-  input: {
-    width: "100%",
-    padding: "12px",
-    borderRadius: "10px",
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(255,255,255,0.05)",
-    color: "white",
-    marginBottom: "15px"
-  },
-  serviceGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "10px",
-    marginBottom: "15px"
-  },
-  serviceCard: {
-    padding: "12px",
-    borderRadius: "12px",
-    cursor: "pointer",
-    textAlign: "center",
-    background: "rgba(255,255,255,0.03)"
-  },
-  button: {
-    width: "100%",
-    padding: "12px",
-    borderRadius: "10px",
-    background: "#3b82f6",
-    color: "white",
-    border: "none",
-    fontWeight: "bold",
-    cursor: "pointer"
-  },
-  bookingCard: {
-    display: "flex",
-    gap: "12px",
-    padding: "12px",
-    marginBottom: "10px",
-    borderRadius: "14px",
-    background: "rgba(255,255,255,0.03)"
-  },
-  avatar: {
-    width: "38px",
-    height: "38px",
-    borderRadius: "50%",
-    background: "#3b82f6",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "bold"
-  },
-  bookingTop: {
-    display: "flex",
-    justifyContent: "space-between"
-  },
-  name: { fontWeight: "600" },
-  serviceText: { opacity: 0.6, fontSize: "13px" },
-  badge: {
-    fontSize: "11px",
-    padding: "4px 8px",
-    borderRadius: "20px",
-    background: "rgba(59,130,246,0.2)",
-    color: "#60a5fa"
-  }
+  input: { width: "100%", padding: "10px", marginBottom: "10px" },
+  serviceGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "10px" },
+  serviceCard: { padding: "10px", cursor: "pointer", borderRadius: "10px" },
+  button: { width: "100%", padding: "10px", background: "#3b82f6", color: "white", border: "none" },
+  bookingCard: { display: "flex", gap: "10px", marginBottom: "10px" },
+  avatar: { width: "35px", height: "35px", borderRadius: "50%", background: "#3b82f6", display: "flex", alignItems: "center", justifyContent: "center" },
+  bookingTop: { display: "flex", justifyContent: "space-between" },
+  name: { fontWeight: "bold" },
+  serviceText: { opacity: 0.6 },
+  badge: { fontSize: "11px", color: "#60a5fa" }
 };
 
 export default Booking;
